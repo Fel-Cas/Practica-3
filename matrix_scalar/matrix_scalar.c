@@ -29,7 +29,7 @@ void* scalar_matrix_parallel(void* arg) {
     return NULL;
 }
 
-void multiply_matrix_by_scalar(int rows, int cols, double scalar){
+void multiply_matrix_by_scalar(int rows, int cols, double scalar, int n){
     //Se crea la matriz
     Matrix* M = create_matrix(rows, cols);
     //Se inicializa la matriz con numeros aleatorios
@@ -47,7 +47,7 @@ void multiply_matrix_by_scalar(int rows, int cols, double scalar){
     //Se copia la matriz original a la matriz auxiliar
     copy_matrix(M2,M);
     //Se llama a la funcion que realiza la multiplicacion de la matriz por un escalar usando paralelismo
-    parallel_multiply_matrix_by_scalar(M2,scalar);
+    parallel_multiply_matrix_by_scalar(M2,scalar,n);
     //Se libera la memoria de las matrices
     free_matrix(M);
     
@@ -70,11 +70,11 @@ void normal_multiply_matrix_by_scalar(Matrix* M,double scalar){
 }
 
 //Funcion para realizar la multiplicacion de la matriz por un escalar usando paralelismo
-void parallel_multiply_matrix_by_scalar(Matrix* M,double scalar){
+void parallel_multiply_matrix_by_scalar(Matrix* M,double scalar, int n){
 
     printf("\nParallel multiply matrix by scalar\n");
     struct timeval start, end;
-    const int num_threads = 4;  // Número de hilos
+    const int num_threads = n;  // Número de hilos
     //Se crea un arreglo de hilos
     pthread_t threads[num_threads];
     //se inicializa la estructura de datos con el número de hilos a utilizar

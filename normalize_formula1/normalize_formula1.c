@@ -33,7 +33,7 @@ void* normalize_columns_formula_1(void* args_ptr) {
     return NULL;
 }
 
-void main_normalize_formula_1(int rows, int cols){
+void main_normalize_formula_1(int rows, int cols, int n){
     //Se crea la matriz
     Matrix* M = create_matrix(rows, cols);
     //Se inicializa la matriz con numeros aleatorios
@@ -53,7 +53,7 @@ void main_normalize_formula_1(int rows, int cols){
     //Se copia la matriz original a la matriz auxiliar
     copy_matrix(M2,M);
     //Se llama a la funcion que realiza la normalicón de la matriz por un escalar usando paralelismo
-    normalize_matrix_with_parallel_programming(M2,larger_numbers, minors_numbers);
+    normalize_matrix_with_parallel_programming(M2,larger_numbers, minors_numbers, n);
     //Se libera la memoria de las matrices
     free_matrix(M);
 }
@@ -69,11 +69,11 @@ void normalize_matrix(Matrix* M, Vector* larger_numbers, Vector* minors_numbers)
     free_matrix(M);
 }
 
-void normalize_matrix_with_parallel_programming(Matrix* M, Vector* larger_numbers, Vector* minors_numbers){
+void normalize_matrix_with_parallel_programming(Matrix* M, Vector* larger_numbers, Vector* minors_numbers, int n){
      printf("\nNormalize matrix  formula 1 with Parallel programming\n");
 
     struct timeval start, end;
-    const int num_threads = 4;  // Número de hilos
+    const int num_threads = n;  // Número de hilos
     pthread_mutex_t lock;
     pthread_mutex_init(&lock, NULL);
 

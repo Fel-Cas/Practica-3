@@ -29,7 +29,7 @@ void* normalize_matrix_column_formula_2_thread(void* args) {
     pthread_exit(NULL);
 }
 
-void main_normalize_formula_2(int rows, int cols){
+void main_normalize_formula_2(int rows, int cols, int n){
     Matrix* M = create_matrix(rows, cols);
     init_matrix_rand(M);
     Vector* vrz = matrix_col_vrz(M);
@@ -40,7 +40,7 @@ void main_normalize_formula_2(int rows, int cols){
     execute_normalize_formula_2_normal(M1, vrz,std);
     Matrix* M2 = create_matrix(rows, cols);
     copy_matrix(M2,M);
-    execute_normalize_formula_2_parallel(M2, vrz,std);
+    execute_normalize_formula_2_parallel(M2, vrz,std,n);
     free_matrix(M);
 
 }
@@ -56,9 +56,9 @@ void execute_normalize_formula_2_normal(Matrix* M, Vector* vrz, Vector* std){
     free_matrix(M);
 }
 
-void execute_normalize_formula_2_parallel(Matrix* M, Vector* vrz, Vector* std) {
+void execute_normalize_formula_2_parallel(Matrix* M, Vector* vrz, Vector* std, int n) {
     printf("\nNormalize matrix  formula 2 with Parallel programming\n");
-    int num_threads = 4;
+    int num_threads = n;
     struct timeval start, end;
     gettimeofday(&start, 0);
     pthread_t threads[num_threads];

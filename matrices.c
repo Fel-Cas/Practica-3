@@ -9,37 +9,39 @@
 #include "./normalize_formula2/normalize_formula2.c"
 
 int main(int argc, char *argv[]){
-    int o=0,f=0,c=0,r=0,s=0,p=0;
+    int o=0,f=0,c=0,r=0,s=0,n=0;
+    char p = NULL;
     double e=0;
-    get_params(argc,argv,&o,&f,&c,&e,&r,&s,&p);
-    if(p==0){
+    get_params(argc,argv,&o,&f,&c,&e,&r,&s,&p,&n);
+    if(p==NULL){
         switch(o){
             case 1:
-                break;
+                return 0;
             case 2:
-                break;
+                return 0;
             case 3:
-                break;
+                return 0;
             case 4:
-                break;
+                return 0;
             case 5:
-                break;
+                return 0;
             case 6:
-                break;
+               return 0;
             case 7:
-                 multiply_matrix_by_scalar(f,c,e);
-                break;
+                 multiply_matrix_by_scalar(f,c,e,n);
+               return 0;
             case 8:
-                  main_normalize_formula_1(f,c);  
-                break;
+                  main_normalize_formula_1(f,c,n);  
+                return 0;
             case 9:
-                  main_normalize_formula_2(f,c);
-                break;
+                  main_normalize_formula_2(f,c,n);
+                return 0;
             default:
                 printf("Operacion no valida %d ",o);
                 exit(EXIT_FAILURE);
             }
         }
+        printf("p = %s\n", p);
     return 0;
 }
 
