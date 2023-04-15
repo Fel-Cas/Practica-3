@@ -10,7 +10,7 @@ void add_two_matrices(int m1_rows, int m1_cols, int m2_rows, int m2_cols, int n)
 void add_matrices_without_paralellism(Matrix *M, Matrix *N);
 void add_matrices_with_paralellism(Matrix *M, Matrix *N, int n);
 
-// Estructura de datos para pasar los argumentos a la funcion que realiza la multiplicacion de la matriz por un escalar usando paralelismo
+// Estructura de datos para pasar los argumentos a la funcion que realiza la suma de matrices usando paralelismo
 typedef struct
 {
     Matrix *R;
@@ -79,7 +79,7 @@ void add_matrices_without_paralellism(Matrix *M, Matrix *N)
     Matrix *R = add_matrix(M, N);
     // Se obtiene el tiempo de finalizacion
     gettimeofday(&end, 0);
-    // Se imprime el tiempo de ejecucion y el resultado de la multiplicación
+    // Se imprime el tiempo de ejecucion y el resultado de la suma
     get_execution_time(start, end);
     print_matrix(R);
     free_matrix(R);
@@ -126,7 +126,7 @@ void add_matrices_with_paralellism(Matrix *M, Matrix *N, int n)
     pthread_mutex_destroy(&mutex); // Destruimos el mutex
     // Se obtiene el tiempo de finalizacion
     gettimeofday(&end, 0);
-    // Se imprime el tiempo de ejecucion y el resultado de la multiplicación
+    // Se imprime el tiempo de ejecucion y el resultado de la suma
     get_execution_time(start, end);
     // Se imprime la matriz resultado
     print_matrix(R);

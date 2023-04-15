@@ -10,7 +10,7 @@ void dot_two_matrices(int m1_rows, int m1_cols, int m2_rows, int m2_cols, int n)
 void dot_matrices_without_paralellism(Matrix *M, Matrix *N);
 void dot_matrices_with_paralellism(Matrix *M, Matrix *N, int n);
 
-// Estructura de datos para pasar los argumentos a la funcion que realiza la multiplicacion de la matriz por un escalar usando paralelismo
+// Estructura de datos para pasar los argumentos a la funcion que realiza el producto punto entre dos matrices usando paralelismo
 typedef struct
 {
     Matrix *R;
@@ -21,7 +21,7 @@ typedef struct
     pthread_mutex_t *mutex;
 } MatricesDotArgs;
 
-// Funcion que realiza la suma de las matrices usando paralelismo
+// Funcion que realiza el producto punto de las matrices usando paralelismo
 void *dot_matrices_parallel(void *arg)
 {
     MatricesDotArgs *args = (MatricesDotArgs *)arg;
@@ -63,17 +63,17 @@ void dot_two_matrices(int m1_rows, int m1_cols, int m2_rows, int m2_cols, int n)
     // Se imprime la matriz 2
     print_matrix(N);
 
-    // Suma de matrices sin paralelismo
+    // Producto punto de matrices sin paralelismo
     dot_matrices_without_paralellism(M, N);
 
-    // Suma de matrices con paralelismo
+    // Producto punto de matrices con paralelismo
     dot_matrices_with_paralellism(M, N, n);
 
     free_matrix(M);
     free_matrix(N);
 }
 
-// Funcion para realizar la suma de la matriz  sin usar paralelismo
+// Funcion para realizar el producto punto las matrices sin usar paralelismo
 void dot_matrices_without_paralellism(Matrix *M, Matrix *N)
 {
     printf("\nDot of matrices without paralellism\n");
@@ -84,7 +84,7 @@ void dot_matrices_without_paralellism(Matrix *M, Matrix *N)
     Matrix *R = dot_matrix(M, N);
     // Se obtiene el tiempo de finalizacion
     gettimeofday(&end, 0);
-    // Se imprime el tiempo de ejecucion y el resultado de la multiplicación
+    // Se imprime el tiempo de ejecucion y el resultado del producto punto
     get_execution_time(start, end);
     print_matrix(R);
     free_matrix(R);
@@ -95,7 +95,7 @@ void dot_matrices_with_paralellism(Matrix *M, Matrix *N, int n)
     printf("\nDot of matrices with paralellism\n");
     struct timeval start, end;
     const int num_threads = n;                   // Número de hilos
-    Matrix *R = create_matrix(M->rows, N->cols); // Matriz con el resultado de la suma
+    Matrix *R = create_matrix(M->rows, N->cols); // Matriz con el resultado del producto punto
     // Se crea un arreglo de hilos
     pthread_t threads[num_threads];
     // se inicializa la estructura de datos con el número de hilos a utilizar
@@ -130,7 +130,7 @@ void dot_matrices_with_paralellism(Matrix *M, Matrix *N, int n)
     pthread_mutex_destroy(&mutex); // Destruimos el mutex
     // Se obtiene el tiempo de finalizacion
     gettimeofday(&end, 0);
-    // Se imprime el tiempo de ejecucion y el resultado de la multiplicación
+    // Se imprime el tiempo de ejecucion y el resultado del producto punto
     get_execution_time(start, end);
     // Se imprime la matriz resultado
     print_matrix(R);
