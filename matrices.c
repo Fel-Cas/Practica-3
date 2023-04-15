@@ -7,6 +7,8 @@
 #include "./matrix_scalar/matrix_scalar.c"
 #include "./normalize_formula1/normalize_formula1.c"
 #include "./normalize_formula2/normalize_formula2.c"
+#include "./matrices_sum/matrices_sum.c"
+
 
 int main(int argc, char *argv[]){
     int o=0,f=0,c=0,r=0,s=0,n=0;
@@ -24,6 +26,7 @@ int main(int argc, char *argv[]){
             case 4:
                 return 0;
             case 5:
+                add_two_matrices(f,c,r,s,n);
                 return 0;
             case 6:
                return 0;
