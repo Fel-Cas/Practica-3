@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "parametros.c"
-#include "matrix_scalar.c"
+#include "./params/parametros.c"
+#include "./matrix_scalar/matrix_scalar.c"
 
 
 int main(int argc, char *argv[]){

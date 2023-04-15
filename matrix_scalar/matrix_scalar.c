@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/time.h>
-#include "execution_time.c"
-#include "matrix.c"
+#include "../execution_time/execution_time.c"
+#include "../matrix/matrix.c"
 #include <pthread.h>
 
 typedef struct {
