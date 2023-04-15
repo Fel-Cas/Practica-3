@@ -279,3 +279,36 @@ void normalize_matrix_column_formula_1(Matrix* M, Vector* mayores, Vector* menor
         }
     }
 }
+
+Vector* matrix_col_vrz(Matrix* M){
+    Vector* v = create_vector(M->cols);
+    for (int i = 0; i < M->cols; ++i) {
+        double sum = 0.0;
+        for (int j = 0; j < M->rows; ++j) {
+            sum += M->elements[j][i];
+        }
+        v->elements[i] = sum / M->rows;
+    }
+    return v; 
+}
+
+Vector* matrix_col_std(Matrix* M){
+    Vector* v = create_vector(M->cols);
+    Vector* vrz = matrix_col_vrz(M);
+    for (int i = 0; i < M->cols; ++i) {
+        double sum = 0.0;
+        for (int j = 0; j < M->rows; ++j) {
+            sum += pow(M->elements[j][i] - vrz->elements[i], 2);
+        }
+        v->elements[i] = sqrt(sum / M->rows);
+    }
+    return v; 
+}
+
+void normalize_matrix_column_formula_2(Matrix* M, Vector* vrz, Vector* std){
+    for (int i = 0; i < M->rows; ++i) {
+        for (int j = 0; j < M->cols; ++j) {
+            M->elements[i][j] = (M->elements[i][j] - vrz->elements[j]) / std->elements[j];
+        }
+    }
+}

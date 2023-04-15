@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include <sys/time.h>
 #include "../execution_time/time.h"
-#include "../matrix/matrix.h"
+#include "./matrix_scalar.h"
 #include <pthread.h>
 
 
@@ -28,12 +28,6 @@ void* scalar_matrix_parallel(void* arg) {
     }
     return NULL;
 }
-
-void multiply_matrix_by_scalar(int rows, int cols, double scalar);
-void validate_data(int rows, int cols, double scalar);
-void normal_multiply_matrix_by_scalar(Matrix* M,double scalar);
-void parallel_multiply_matrix_by_scalar(Matrix* M,double scalar);
-
 
 void multiply_matrix_by_scalar(int rows, int cols, double scalar){
     //Se crea la matriz
@@ -64,11 +58,11 @@ void normal_multiply_matrix_by_scalar(Matrix* M,double scalar){
     printf("\nNormal multiply matrix by scalar\n");
     //Se obtiene el tiempo de inicio
     struct timeval start, end;
-    gettimeofday(&start, NULL);
+    gettimeofday(&start, 0);
     //Se realiza la multiplicacion de la matriz por un escalar
     scalar_matrix(M,scalar);
     //Se obtiene el tiempo de finalizacion
-    gettimeofday(&end, NULL);
+    gettimeofday(&end, 0);
     //Se imprime el tiempo de ejecucion y el resultado de la multiplicación
     get_execution_time(start, end);
     print_matrix(M);
@@ -89,7 +83,7 @@ void parallel_multiply_matrix_by_scalar(Matrix* M,double scalar){
     pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER; 
 
     //Se obtiene el tiempo de inicio
-    gettimeofday(&start, NULL);
+    gettimeofday(&start, 0);
     //Se divide la matriz en partes iguales para cada hilo
     const int chunk_size = M->rows / num_threads;
     //Se le asigna a cada hilo una parte de la matriz
@@ -111,7 +105,7 @@ void parallel_multiply_matrix_by_scalar(Matrix* M,double scalar){
     }
     pthread_mutex_destroy(&mutex); // Destruimos el mutex
     //Se obtiene el tiempo de finalizacion
-    gettimeofday(&end, NULL);
+    gettimeofday(&end, 0);
     //Se imprime el tiempo de ejecucion y el resultado de la multiplicación
     get_execution_time(start, end);
     //Se imprime la matriz

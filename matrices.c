@@ -6,6 +6,7 @@
 #include "./params/parametros.c"
 #include "./matrix_scalar/matrix_scalar.c"
 #include "./normalize_formula1/normalize_formula1.c"
+#include "./normalize_formula2/normalize_formula2.c"
 
 int main(int argc, char *argv[]){
     int o=0,f=0,c=0,r=0,s=0,p=0;
@@ -32,6 +33,7 @@ int main(int argc, char *argv[]){
                   main_normalize_formula_1(f,c);  
                 break;
             case 9:
+                  main_normalize_formula_2(f,c);
                 break;
             default:
                 printf("Operacion no valida %d ",o);
