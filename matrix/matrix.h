@@ -36,8 +36,8 @@ Matrix* dot_matrix(const Matrix* M, const Matrix* N);
 
 Vector* matrix_col_mean(const Matrix* M);
 Vector* matrix_col_sum(const Matrix* M);
-//Vector* matrix_col_max(const Matrix* M);
-//Vector* matrix_col_min(const Matrix* M);
+Vector* matrix_col_max(Matrix* M);
+Vector* matrix_col_min(Matrix* M);
 //Vector* matrix_col_vrz(const Matrix* M);
 //Vector* matrix_col_std(const Matrix* M);
 void scalar_matrix(Matrix* M, double k);
@@ -45,5 +45,5 @@ void scalar_vector(Vector* V, double k);
 
 void print_vector(const Vector* v);
 void print_matrix(const Matrix* M);
-
+void normalize_matrix_column_formula_1(Matrix* M, Vector* mayores, Vector* menores);
 #endif

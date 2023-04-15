@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/time.h>
-#include "../execution_time/execution_time.c"
-#include "../matrix/matrix.c"
+#include "../execution_time/time.h"
+#include "../matrix/matrix.h"
 #include <pthread.h>
 
 

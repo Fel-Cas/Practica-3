@@ -233,7 +233,7 @@ void print_vector(const Vector* v) {
 }
 
 void print_matrix(const Matrix* M) {
-    printf("rows=%d,cols=%d,[", M->rows, M->cols);
+    printf("rows=%d,cols=%d,\n[\n", M->rows, M->cols);
     for (int i = 0; i < M->rows; ++i) {
         printf("[");
         for (int j = 0; j < M->cols; ++j) {
@@ -242,4 +242,40 @@ void print_matrix(const Matrix* M) {
         printf("]\n");
     }
     printf("]\n");
+}
+
+Vector* matrix_col_max(Matrix* M){
+    Vector* v = create_vector(M->cols);
+    for (int i = 0; i < M->cols; ++i) {
+        double max = M->elements[0][i];
+        for (int j = 0; j < M->rows; ++j) {
+            if (max < M->elements[j][i]) {
+                max = M->elements[j][i];
+            }
+        }
+        v->elements[i] = max;
+    }
+    return v; 
+}
+
+Vector* matrix_col_min(Matrix* M){
+    Vector* v = create_vector(M->cols);
+    for (int i = 0; i < M->cols; ++i) {
+        double min = M->elements[0][i];
+        for (int j = 0; j < M->rows; ++j) {
+            if (min > M->elements[j][i]) {
+                min = M->elements[j][i];
+            }
+        }
+        v->elements[i] = min;
+    }
+    return v; 
+}
+
+void normalize_matrix_column_formula_1(Matrix* M, Vector* mayores, Vector* menores){
+    for (int i = 0; i < M->rows; ++i) {
+        for (int j = 0; j < M->cols; ++j) {
+            M->elements[i][j] = (M->elements[i][j] - menores->elements[j]) / (mayores->elements[j] - menores->elements[j]);
+        }
+    }
 }
