@@ -8,6 +8,8 @@
 #include "./normalize_formula1/normalize_formula1.c"
 #include "./normalize_formula2/normalize_formula2.c"
 #include "./matrices_sum/matrices_sum.c"
+#include "./matrices_dot/matrices_dot.c"
+
 
 
 int main(int argc, char *argv[]){
@@ -29,7 +31,9 @@ int main(int argc, char *argv[]){
                 add_two_matrices(f,c,r,s,n);
                 return 0;
             case 6:
-               return 0;
+                dot_two_matrices(f,c,r,s,n);
+                printf("hola");
+                return 0;
             case 7:
                  multiply_matrix_by_scalar(f,c,e,n);
                return 0;
