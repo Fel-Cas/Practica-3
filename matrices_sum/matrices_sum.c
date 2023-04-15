@@ -16,7 +16,7 @@ void add_two_matrices(int m1_rows, int m1_cols, int m2_rows, int m2_cols, int n)
     print_matrix(M);
 
     // Se crea la matriz 2
-    Matrix *N = create_matrix(m1_rows, m1_cols);
+    Matrix *N = create_matrix(m2_rows, m2_cols);
     // Se inicializa la matriz 2 con numeros aleatorios
     init_matrix_rand(N);
     // Se imprime la matriz 2
