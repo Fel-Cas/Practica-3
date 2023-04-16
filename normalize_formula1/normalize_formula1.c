@@ -10,24 +10,20 @@ typedef struct {
     Matrix* M;
     Vector* mayores;
     Vector* menores;
-    int start_col;
-    int end_col;
+    int start_row;
+    int end_row;
     pthread_mutex_t* lock;
 } NormalizeArgs;
 
-void* normalize_columns_formula_1(void* args_ptr) {
+void* normalize_rows_formula_1(void* args_ptr) {
     NormalizeArgs* args = (NormalizeArgs*) args_ptr;
 
-    for (int j = args->start_col; j < args->end_col; ++j) {
-       
-
-        for (int i = 0; i < args->M->rows; ++i) {
+    for (int i = args->start_row; i < args->end_row; ++i) {
+        for (int j = 0; j < args->M->cols; ++j) {
             pthread_mutex_lock(args->lock);
             args->M->elements[i][j] = (args->M->elements[i][j] - args->menores->elements[j]) / (args->mayores->elements[j] - args->menores->elements[j]);
             pthread_mutex_unlock(args->lock);
         }
-
-        
     }
 
     return NULL;
@@ -69,38 +65,34 @@ void normalize_matrix(Matrix* M, Vector* larger_numbers, Vector* minors_numbers)
     free_matrix(M);
 }
 
-void normalize_matrix_with_parallel_programming(Matrix* M, Vector* larger_numbers, Vector* minors_numbers, int n){
-     printf("\nNormalize matrix  formula 1 with Parallel programming\n");
-
+void normalize_matrix_with_parallel_programming(Matrix* M, Vector* mayores, Vector* menores, int n) {
+    printf("\nNormalize matrix formula 1 with Parallel programming\n");
     struct timeval start, end;
     const int num_threads = n;  // Número de hilos
     pthread_mutex_t lock;
-    pthread_mutex_init(&lock, NULL);
-
-    gettimeofday(&start, 0);
+    pthread_mutex_init(&lock, NULL);    
     pthread_t threads[num_threads];
     NormalizeArgs args[num_threads];
-
-    int chunk_size = M->cols / num_threads;
-    int extra_cols = M->cols % num_threads;
-
+    int chunk_size = M->rows / num_threads;
+    int extra_rows = M->rows % num_threads;
+    gettimeofday(&start, 0);
     for (int i = 0; i < num_threads; ++i) {
         args[i].M = M;
-        args[i].mayores = larger_numbers;
-        args[i].menores = minors_numbers;
+        args[i].mayores = mayores;
+        args[i].menores = menores;
         args[i].lock = &lock;
 
-        int start_col = i * chunk_size;
-        int end_col = (i + 1) * chunk_size;
+        int start_row = i * chunk_size;
+        int end_row = (i + 1) * chunk_size;
 
         if (i == num_threads - 1) {
-            end_col += extra_cols;
+            end_row += extra_rows;
         }
 
-        args[i].start_col = start_col;
-        args[i].end_col = end_col;
+        args[i].start_row = start_row;
+        args[i].end_row = end_row;
 
-        pthread_create(&threads[i], NULL, normalize_columns_formula_1, &args[i]);
+        pthread_create(&threads[i], NULL, normalize_rows_formula_1, &args[i]);
     }
 
     for (int i = 0; i < num_threads; ++i) {
@@ -109,6 +101,7 @@ void normalize_matrix_with_parallel_programming(Matrix* M, Vector* larger_number
 
     pthread_mutex_destroy(&lock);
     gettimeofday(&end, 0);
+
     //Se imprime el tiempo de ejecucion y el resultado de la multiplicación
     get_execution_time(start, end);
     //Se imprime la matriz

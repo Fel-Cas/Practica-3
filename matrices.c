@@ -7,17 +7,16 @@
 #include "./matrix_scalar/matrix_scalar.c"
 #include "./normalize_formula1/normalize_formula1.c"
 #include "./normalize_formula2/normalize_formula2.c"
+#include "./file/file.c"
 #include "./matrices_sum/matrices_sum.c"
 #include "./matrices_dot/matrices_dot.c"
 
-
-
 int main(int argc, char *argv[]){
     int o=0,f=0,c=0,r=0,s=0,n=0;
-    char p = NULL;
+    char p[200] = "";
     double e=0;
-    get_params(argc,argv,&o,&f,&c,&e,&r,&s,&p,&n);
-    if(p==NULL){
+    get_params(argc,argv,&o,&f,&c,&e,&r,&s,p,&n);
+    if(strcmp(p, "") == 0){
         switch(o){
             case 1:
                 return 0;
@@ -48,7 +47,13 @@ int main(int argc, char *argv[]){
                 exit(EXIT_FAILURE);
             }
         }
-        printf("p = %s\n", p);
+    printf("p = %s\n", p);
+    read_file(&o,&f, &c, &e, &r, &s, p,&n);
+    printf("The value of o is %d\n", o);
+    printf("The value of f is %d\n", f);
+    printf("The value of c is %d\n", c);
+    Matrix *matrix1 = create_matrix_from_file("op1.txt", f, c);
+    print_matrix(matrix1);
     return 0;
 }
 

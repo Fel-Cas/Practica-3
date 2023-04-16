@@ -7,19 +7,17 @@
 #include "./normalize_formula2.h"
 
 typedef struct {
-    int thread_id;
-    int num_threads;
+    int start_row;
+    int end_row;
     Matrix* M;
     Vector* vrz;
     Vector* std;
     pthread_mutex_t* mutex;
 } thread_args_t;
 
-void* normalize_matrix_column_formula_2_thread(void* args) {
+void* normalize_matrix_column_formula_2_row_thread(void* args) {
     thread_args_t* thread_args = (thread_args_t*) args;
-    int start_row = (thread_args->thread_id * thread_args->M->rows) / thread_args->num_threads;
-    int end_row = ((thread_args->thread_id + 1) * thread_args->M->rows) / thread_args->num_threads;
-    for (int i = start_row; i < end_row; ++i) {
+    for (int i = thread_args->start_row; i < thread_args->end_row; ++i) {
         for (int j = 0; j < thread_args->M->cols; ++j) {
             pthread_mutex_lock(thread_args->mutex);
             thread_args->M->elements[i][j] = (thread_args->M->elements[i][j] - thread_args->vrz->elements[j]) / thread_args->std->elements[j];
@@ -40,7 +38,7 @@ void main_normalize_formula_2(int rows, int cols, int n){
     execute_normalize_formula_2_normal(M1, vrz,std);
     Matrix* M2 = create_matrix(rows, cols);
     copy_matrix(M2,M);
-    execute_normalize_formula_2_parallel(M2, vrz,std,n);
+    normalize_matrix_column_formula_2_parallel(M2, vrz,std,n);
     free_matrix(M);
 
 }
@@ -56,23 +54,27 @@ void execute_normalize_formula_2_normal(Matrix* M, Vector* vrz, Vector* std){
     free_matrix(M);
 }
 
-void execute_normalize_formula_2_parallel(Matrix* M, Vector* vrz, Vector* std, int n) {
-    printf("\nNormalize matrix  formula 2 with Parallel programming\n");
-    int num_threads = n;
+void normalize_matrix_column_formula_2_parallel(Matrix* M, Vector* vrz, Vector* std, int num_threads) {
+    printf("\nNormalize matrix formula 2 with Parallel programming\n");
     struct timeval start, end;
-    gettimeofday(&start, 0);
     pthread_t threads[num_threads];
     thread_args_t thread_args[num_threads];
     pthread_mutex_t mutex;
     pthread_mutex_init(&mutex, NULL);
+    gettimeofday(&start, 0);
+    int chunk_size = M->rows / num_threads;
+    int extra_rows = M->rows % num_threads;
+    int start_row = 0;
     for (int i = 0; i < num_threads; ++i) {
-        thread_args[i].thread_id = i;
-        thread_args[i].num_threads = num_threads;
+        int rows = chunk_size + (i < extra_rows);
+        thread_args[i].start_row = start_row;
+        thread_args[i].end_row = start_row + rows;
         thread_args[i].M = M;
         thread_args[i].vrz = vrz;
         thread_args[i].std = std;
         thread_args[i].mutex = &mutex;
-        pthread_create(&threads[i], NULL, normalize_matrix_column_formula_2_thread, &thread_args[i]);
+        start_row += rows;
+        pthread_create(&threads[i], NULL, normalize_matrix_column_formula_2_row_thread, &thread_args[i]);
     }
     for (int i = 0; i < num_threads; ++i) {
         pthread_join(threads[i], NULL);
