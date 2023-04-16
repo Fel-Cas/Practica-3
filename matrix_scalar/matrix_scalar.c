@@ -29,13 +29,22 @@ void* scalar_matrix_parallel(void* arg) {
     return NULL;
 }
 
-void multiply_matrix_by_scalar(int rows, int cols, double scalar, int n){
-    //Se crea la matriz
-    Matrix* M = create_matrix(rows, cols);
-    //Se inicializa la matriz con numeros aleatorios
-    init_matrix_rand(M);
+void multiply_matrix_by_scalar(int rows, int cols, double scalar, int n,int file){
+    validate_data_operation_with_one_matrix(rows, cols, n);
+    Matrix* M=NULL;
+    //se valida si se va a leer la matriz de un archivo
+    if(file==1){
+        M=create_matrix_from_file("op1.txt",rows,cols);
+    }else{
+        //Se crea la matriz
+        Matrix* M = create_matrix(rows, cols);
+        //Se inicializa la matriz con numeros aleatorios
+        init_matrix_rand(M);
+    }
+    printf("La matrix es la siguiente: \n");
     //Se imprime la matriz
     print_matrix(M);
+    printf("El escalar es: %f \n",scalar);
     //Creamos otra matriz auxiliar para realizar las operaciones
     Matrix* M1 = create_matrix(rows, cols);
     //Copiamos la matriz original a la matriz que creamos
