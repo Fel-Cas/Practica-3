@@ -100,6 +100,16 @@ void columns_variance_parallel(Matrix *M, int n)
 
 void matrix_columns_variance(int m_rows, int m_cols, int n)
 {
+    if (m_rows <= 0 || m_cols <= 0)
+    {
+        printf("Error: The number of rows and columns must be greater than 0\n");
+        exit(1);
+    }
+    if (n <= 0)
+    {
+        printf("Error: The number of threads must be greater than 0\n");
+        exit(1);
+    }
     // Se crea la matriz
     Matrix *M = create_matrix(m_rows, m_cols);
     // Se inicializa la matriz con numeros aleatorios
