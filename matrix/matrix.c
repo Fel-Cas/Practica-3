@@ -312,3 +312,49 @@ void normalize_matrix_column_formula_2(Matrix* M, Vector* vrz, Vector* std){
         }
     }
 }
+
+void normalize_vector_formula_1(Vector* v, float max, float min){
+    for (int i = 0; i < v->size; ++i) {
+        v->elements[i] = (v->elements[i] - min) / (max - min);
+    }
+}
+
+float max_vector(const Vector* v){
+    float max = v->elements[0];
+    for (int i = 0; i < v->size; ++i) {
+        if (max < v->elements[i]) {
+            max = v->elements[i];
+        }
+    }
+    return max;
+}
+float min_vector(const Vector* v){
+    float min = v->elements[0];
+    for (int i = 0; i < v->size; ++i) {
+        if (min > v->elements[i]) {
+            min = v->elements[i];
+        }
+    }
+    return min;
+}
+float vrz_vector(const Vector* v){
+    float sum = 0.0;
+    for (int i = 0; i < v->size; ++i) {
+        sum += v->elements[i];
+    }
+    return sum / v->size;
+}
+float std_vector(const Vector* v){
+    float sum = 0.0;
+    float vrz = vrz_vector(v);
+    for (int i = 0; i < v->size; ++i) {
+        sum += pow(v->elements[i] - vrz, 2);
+    }
+    return sqrt(sum / v->size);
+}
+
+void normalize_vector_formula_2(Vector* v, float vrz, float std){
+    for (int i = 0; i < v->size; ++i) {
+        v->elements[i] = (v->elements[i] - vrz) / std;
+    }
+}

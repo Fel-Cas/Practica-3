@@ -33,7 +33,10 @@ Vector* add_vector(const Vector* a, const Vector* b);
 Vector* dot_vector_matrix(const Vector* v, const Matrix* M);
 Matrix* add_matrix(const Matrix* M, const Matrix* N);
 Matrix* dot_matrix(const Matrix* M, const Matrix* N);
-
+float max_vector(const Vector* v);
+float min_vector(const Vector* v);
+float vrz_vector(const Vector* v);
+float std_vector(const Vector* v);
 Vector* matrix_col_mean(const Matrix* M);
 Vector* matrix_col_sum(const Matrix* M);
 Vector* matrix_col_max(Matrix* M);
@@ -47,4 +50,6 @@ void print_vector(const Vector* v);
 void print_matrix(const Matrix* M);
 void normalize_matrix_column_formula_1(Matrix* M, Vector* mayores, Vector* menores);
 void normalize_matrix_column_formula_2(Matrix* M, Vector* vrz, Vector* std);
+void normalize_vector_formula_1(Vector* v, float max, float min);
+void normalize_vector_formula_2(Vector* v, float vrz, float std);
 #endif
