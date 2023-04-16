@@ -46,7 +46,7 @@ int select_operation(int o, int f, int c, int r, int s, double e, int n, int fil
             printf("hola");
             return 0;
         case 7:
-             multiply_matrix_by_scalar(f,c,e,n);
+             multiply_matrix_by_scalar(f,c,e,n,file);
            return 0;
         case 8:
               main_normalize_formula_1(f,c,n,file);  
