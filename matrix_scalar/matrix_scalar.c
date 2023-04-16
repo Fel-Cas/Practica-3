@@ -38,7 +38,7 @@ void multiply_matrix_by_scalar(int rows, int cols, double scalar, int n,int file
         M=create_matrix_from_file("op1.txt",rows,cols);
     }else{
         //Se crea la matriz
-        Matrix* M = create_matrix(rows, cols);
+        M = create_matrix(rows, cols);
         //Se inicializa la matriz con numeros aleatorios
         init_matrix_rand(M);
     }
