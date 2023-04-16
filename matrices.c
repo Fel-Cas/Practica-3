@@ -10,6 +10,7 @@
 #include "./file/file.c"
 #include "./matrices_sum/matrices_sum.c"
 #include "./matrices_dot/matrices_dot.c"
+#include "./column_mean/column_mean.c"
 
 int main(int argc, char *argv[]){
     int o=0,f=0,c=0,r=0,s=0,n=0;
@@ -19,6 +20,7 @@ int main(int argc, char *argv[]){
     if(strcmp(p, "") == 0){
         switch(o){
             case 1:
+                matrix_columns_mean(f,c,n);
                 return 0;
             case 2:
                 return 0;
