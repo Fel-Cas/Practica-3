@@ -4,6 +4,7 @@
 #include <sys/time.h>
 #include "../execution_time/time.h"
 #include "./matrix_scalar.h"
+#include "../validations/validation.h"
 #include <pthread.h>
 
 
