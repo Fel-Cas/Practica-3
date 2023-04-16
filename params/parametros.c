@@ -31,7 +31,8 @@ void get_params(int argc, char *argv[], int *o,int *f, int *c, double *e, int *r
                 *s=atoi(optarg);
                 break;
             case 'p':
-                *p=optarg;
+                strncpy(p, optarg, 200);
+                p[sizeof(p)] = '\0';
                 break;
             default:
                fprintf(stderr, "Usage: %s -o <operation> [-f <value>] [-c <value>] [-e <value>] [-r <value>] [-s <value>] [-p <value>]\n", argv[0]);
