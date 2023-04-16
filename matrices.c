@@ -4,6 +4,7 @@
 #include "./matrix/matrix.c"
 #include "./execution_time/execution_time.c"
 #include "./params/parametros.c"
+#include "./standard_deviation/standard_deviation.c"
 #include "./matrix_scalar/matrix_scalar.c"
 #include "./normalize_formula1/normalize_formula1.c"
 #include "./normalize_formula2/normalize_formula2.c"
@@ -23,6 +24,7 @@ int main(int argc, char *argv[]){
             case 2:
                 return 0;
             case 3:
+                calculate_standard_deviation_by_column(f, c, n);
                 return 0;
             case 4:
                 return 0;
