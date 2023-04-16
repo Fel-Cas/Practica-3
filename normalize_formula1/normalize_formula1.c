@@ -14,7 +14,7 @@ typedef struct {
     int start_row;
     int end_row;
     pthread_mutex_t* lock;
-} NormalizeArgs;
+} Args_normalize_form1_m_t;
 
 //Estructura para pasar los argumentos a la función que normaliza el vector
 typedef struct {
@@ -24,12 +24,12 @@ typedef struct {
     int start;
     int end;
     pthread_mutex_t* mutex;
-}ThreadData;
+}Args_normalize_form2_v_t;
 
 //Función que normaliza el vector
 void* normalize_vector_formula_1_thread(void* arg) {
     //Se Castean los argumentos
-    ThreadData* data = (ThreadData*) arg;
+    Args_normalize_form2_v_t* data = (Args_normalize_form2_v_t*) arg;
     //Se itera sobre el rango asignado al hilo
     for (int i = data->start; i < data->end; i++) {
         //Se adquiere el lock para asegurar la exclusión mutua
@@ -46,7 +46,7 @@ void* normalize_vector_formula_1_thread(void* arg) {
 //Función principal que normaliza la matriz
 void* normalize_formula_1(void* args_ptr) {
     //Se castean los argumentos
-    NormalizeArgs* args = (NormalizeArgs*) args_ptr;
+    Args_normalize_form1_m_t* args = (Args_normalize_form1_m_t*) args_ptr;
     //Se itera sobre el rango asignado al hilo
     for (int i = args->start_row; i < args->end_row; ++i) {
         for (int j = 0; j < args->M->cols; ++j) {
@@ -192,7 +192,7 @@ void normalize_matrix_formula1_with_parallel_programming(Matrix* M, Vector* mayo
     //Se crean los hilos
     pthread_t threads[num_threads];
     //Se crean los argumentos
-    NormalizeArgs args[num_threads];
+    Args_normalize_form1_m_t args[num_threads];
     //Se calcula la cantidad de filas que va a tener cada hilo
     int chunk_size = M->rows / num_threads;
     int extra_rows = M->rows % num_threads;
@@ -234,7 +234,7 @@ void normalize_matrix_formula1_with_parallel_programming(Matrix* M, Vector* mayo
 void normalize_vector_formula1_with_parallel_programming(Vector* v, float max, float min, int num_threads) {
     printf("\nNormalize vector formula 1 with Parallel programming\n");
     //Se crean los argumentos
-    ThreadData data[num_threads];
+    Args_normalize_form2_v_t data[num_threads];
     pthread_t threads[num_threads];
     pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
     //Se calcula la cantidad de elementos que va a tener cada hilo
