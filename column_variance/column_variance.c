@@ -6,7 +6,7 @@
 #include <pthread.h>
 #include "../matrix/matrix.h"
 
-// Estructura de datos para pasar los argumentos a la funcion que realiza la media de columnas de una matriz, usando paralelismo
+// Estructura de datos para pasar los argumentos a la funcion que realiza la varianza de columnas de una matriz, usando paralelismo
 typedef struct
 {
     Vector *R;
@@ -14,16 +14,16 @@ typedef struct
     int start_row;
     int end_row;
     pthread_mutex_t *mutex;
-} MatricesMeanArgs;
+} MatricesVarianceArgs;
 
-void columns_mean(Matrix *M)
+void columns_variance(Matrix *M)
 {
-    printf("\nMean of matrices without paralellism\n");
+    printf("\nVariance of matrices without paralellism\n");
     // Se obtiene el tiempo de inicio
     struct timeval start, end;
     gettimeofday(&start, 0);
     // Media de matrices sin paralelismo
-    Vector *R = matrix_col_mean(M);
+    Vector *R = matrix_col_vrz(M);
     // Se obtiene el tiempo de fin
     gettimeofday(&end, 0);
     // Se imprime el tiempo de ejecucion y el resultado de la media
@@ -33,9 +33,9 @@ void columns_mean(Matrix *M)
 }
 
 // Funcion que realiza la media de las matrices usando paralelismo
-void *column_mean_parallel(void *arg)
+void *column_variance_parallel(void *arg)
 {
-    MatricesMeanArgs *args = (MatricesMeanArgs *)arg;
+    MatricesVarianceArgs *args = (MatricesVarianceArgs *)arg;
     for (int i = args->start_row; i < args->end_row; ++i)
     {
         double sum = 0.0;
@@ -50,18 +50,18 @@ void *column_mean_parallel(void *arg)
     return NULL;
 }
 
-void columns_mean_parallel(Matrix *M, int n)
+void columns_variance_parallel(Matrix *M, int n)
 {
-    printf("\nMean of matrices with paralellism\n");
+    printf("\nVariance of matrices with paralellism\n");
     // Se obtiene el tiempo de inicio
     struct timeval start, end;
-    // Se inicializa la estructura de datos con el número de hilos a utilizar
+    // Se asigna el número de hilos a utilizar
     const int num_threads = n;
-    Vector *R = create_vector(M->cols); // Vector con el resultado de la media
+    Vector *R = create_vector(M->cols); // Vector con el resultado de la varianza
     // Se crea un arreglo de hilos
     pthread_t threads[num_threads];
     // se inicializa la estructura de datos con el número de hilos a utilizar
-    MatricesMeanArgs thread_args[num_threads];
+    MatricesVarianceArgs thread_args[num_threads];
     // se inicializa el lock
     pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
     // Se obtiene el tiempo de inicio
@@ -78,8 +78,8 @@ void columns_mean_parallel(Matrix *M, int n)
             end_row = M->rows;
         }
         // Se inicializan los datos necesarios para cada hilo
-        thread_args[i] = (MatricesMeanArgs){.R = R, .M = M, .start_row = start_row, .end_row = end_row, .mutex = &mutex};
-        pthread_create(&threads[i], NULL, column_mean_parallel, &thread_args[i]);
+        thread_args[i] = (MatricesVarianceArgs){.R = R, .M = M, .start_row = start_row, .end_row = end_row, .mutex = &mutex};
+        pthread_create(&threads[i], NULL, column_variance_parallel, &thread_args[i]);
         start_row = end_row;
     }
     // Esperamos a que todos los hilos terminen
@@ -90,15 +90,15 @@ void columns_mean_parallel(Matrix *M, int n)
     pthread_mutex_destroy(&mutex); // Destruimos el mutex
     // Se obtiene el tiempo de finalizacion
     gettimeofday(&end, 0);
-    // Se imprime el tiempo de ejecucion y el resultado de la media
+    // Se imprime el tiempo de ejecucion y el resultado de la varianza
     get_execution_time(start, end);
-    // Se imprime el vector con el resultado de la media
+    // Se imprime el vector resultado
     print_vector(R);
-    // Se libera la memoria del vector
+    // Se libera la memoria del vector resultado
     free_vector(R);
 }
 
-void matrix_columns_mean(int m_rows, int m_cols, int n)
+void matrix_columns_variance(int m_rows, int m_cols, int n)
 {
     // Se crea la matriz
     Matrix *M = create_matrix(m_rows, m_cols);
@@ -106,10 +106,10 @@ void matrix_columns_mean(int m_rows, int m_cols, int n)
     init_matrix_rand(M);
     // Se imprime la matriz
     print_matrix(M);
-    // Se calcula la media de las columnas de la matriz sin paralelismo
-    columns_mean(M);
-    // Se calcula la media de las columnas de la matriz con paralelismo
-    columns_mean_parallel(M, n);
+    // Se ejecuta el calculo de la media de las matrices sin paralelismo
+    columns_variance(M);
+    // Se ejecuta el calculo de la media de las matrices con paralelismo
+    columns_variance_parallel(M, n);
     // Se libera la memoria de la matriz
     free_matrix(M);
 };

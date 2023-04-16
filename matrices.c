@@ -11,6 +11,7 @@
 #include "./matrices_sum/matrices_sum.c"
 #include "./matrices_dot/matrices_dot.c"
 #include "./column_mean/column_mean.c"
+#include "./column_variance/column_variance.c"
 
 int main(int argc, char *argv[]){
     int o=0,f=0,c=0,r=0,s=0,n=0;
@@ -23,6 +24,7 @@ int main(int argc, char *argv[]){
                 matrix_columns_mean(f,c,n);
                 return 0;
             case 2:
+                matrix_columns_variance(f,c,n);
                 return 0;
             case 3:
                 return 0;
