@@ -5,6 +5,7 @@
 #include "../execution_time/time.h"
 #include <pthread.h>
 #include "../matrix/matrix.h"
+#include "../validations/validation.h"
 
 // Estructura de datos para pasar los argumentos a la funcion que realiza la varianza de columnas de una matriz, usando paralelismo
 typedef struct
@@ -101,16 +102,7 @@ void columns_variance_parallel(Matrix *M, int n)
 
 void matrix_columns_variance(int m_rows, int m_cols, int n, int file)
 {
-    if (m_rows <= 0 || m_cols <= 0)
-    {
-        printf("Error: The number of rows and columns must be greater than 0\n");
-        exit(1);
-    }
-    if (n <= 0)
-    {
-        printf("Error: The number of threads must be greater than 0\n");
-        exit(1);
-    }
+    validate_data_operation_with_one_matrix(m_rows, m_cols, n);
     Matrix *M = NULL;
     // Se valida si se ingresa un archivo o se crea una matriz aleatoria
     if (file == 1)
