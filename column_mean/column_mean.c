@@ -112,10 +112,13 @@ void matrix_columns_mean(int m_rows, int m_cols, int n, int file)
     }
     Matrix *M = NULL;
     // Se valida si se ingresa un archivo o se crea una matriz aleatoria
-    if (file == 1){
+    if (file == 1)
+    {
         // Se crea la matriz
-        M = create_matrix_file("op1.txt",m_rows, m_cols);
-    }else{
+        M = create_matrix_from_file("op1.txt", m_rows, m_cols);
+    }
+    else
+    {
         // Se crea la matriz
         M = create_matrix(m_rows, m_cols);
         // Se inicializa la matriz con numeros aleatorios
