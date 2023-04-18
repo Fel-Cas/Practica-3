@@ -49,11 +49,10 @@ int select_operation(int o, int f, int c, int r, int s, double e, int n, int fil
     case 4:
         return 0;
     case 5:
-        add_two_matrices(f, c, r, s, n);
+        add_two_matrices(f, c, r, s, n, file);
         return 0;
     case 6:
         dot_two_matrices(f, c, r, s, n);
-        printf("hola");
         return 0;
     case 7:
         multiply_matrix_by_scalar(f, c, e, n, file);
