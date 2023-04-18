@@ -6,7 +6,7 @@
 #include <pthread.h>
 #include "../matrix/matrix.h"
 
-void dot_two_matrices(int m1_rows, int m1_cols, int m2_rows, int m2_cols, int n);
+void dot_two_matrices(int m1_rows, int m1_cols, int m2_rows, int m2_cols, int n, int file);
 void dot_matrices_without_paralellism(Matrix *M, Matrix *N);
 void dot_matrices_with_paralellism(Matrix *M, Matrix *N, int n);
 
@@ -47,19 +47,30 @@ void *dot_matrices_parallel(void *arg)
     return NULL;
 }
 
-void dot_two_matrices(int m1_rows, int m1_cols, int m2_rows, int m2_cols, int n)
+void dot_two_matrices(int m1_rows, int m1_cols, int m2_rows, int m2_cols, int n, int file)
 {
-    // Se crea la matriz 1
-    Matrix *M = create_matrix(m1_rows, m1_cols);
-    // Se inicializa la matriz 1 con numeros aleatorios
-    init_matrix_rand(M);
+    Matrix *M = NULL, *N = NULL;
+    // se valida si se va a leer la matriz de un archivo
+    if (file == 1)
+    {
+        M = create_matrix_from_file("op1.txt", m1_rows, m1_cols);
+        N = create_matrix_from_file("op2.txt", m2_rows, m2_cols);
+    }
+    else
+    {
+        // Se crea la matriz 1
+        Matrix *M = create_matrix(m1_rows, m1_cols);
+        // Se inicializa la matriz 1 con numeros aleatorios
+        init_matrix_rand(M);
+        // Se crea la matriz 2
+        Matrix *N = create_matrix(m2_rows, m2_cols);
+        // Se inicializa la matriz 2 con numeros aleatorios
+        init_matrix_rand(N);
+    }
+
     // Se imprime la matriz 1
     print_matrix(M);
 
-    // Se crea la matriz 2
-    Matrix *N = create_matrix(m2_rows, m2_cols);
-    // Se inicializa la matriz 2 con numeros aleatorios
-    init_matrix_rand(N);
     // Se imprime la matriz 2
     print_matrix(N);
 
