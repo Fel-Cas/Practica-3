@@ -280,6 +280,7 @@ void normalize_matrix_column_formula_1(Matrix* M, Vector* mayores, Vector* menor
     }
 }
 
+// TODO: Corregir varianza
 Vector* matrix_col_vrz(Matrix* M){
     Vector* v = create_vector(M->cols);
     for (int i = 0; i < M->cols; ++i) {
@@ -292,6 +293,7 @@ Vector* matrix_col_vrz(Matrix* M){
     return v; 
 }
 
+// TODO: Ver si necesita la varianza o la media.
 Vector* matrix_col_std(Matrix* M){
     Vector* v = create_vector(M->cols);
     Vector* vrz = matrix_col_vrz(M);

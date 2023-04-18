@@ -39,10 +39,10 @@ int select_operation(int o, int f, int c, int r, int s, double e, int n, int fil
     switch (o)
     {
     case 1:
-        matrix_columns_mean(f, c, n);
+        matrix_columns_mean(f, c, n, file);
         return 0;
     case 2:
-        matrix_columns_variance(f, c, n);
+        matrix_columns_variance(f, c, n, file);
         return 0;
     case 3:
         return 0;
