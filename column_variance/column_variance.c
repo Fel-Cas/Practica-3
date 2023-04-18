@@ -36,12 +36,13 @@ void columns_variance(Matrix *M)
 void *column_variance_parallel(void *arg)
 {
     MatricesVarianceArgs *args = (MatricesVarianceArgs *)arg;
+    Vector *mean = matrix_col_mean(args->M);
     for (int i = args->start_row; i < args->end_row; ++i)
     {
         double sum = 0.0;
         for (int j = 0; j < args->M->rows; ++j)
         {
-            sum = sum + args->M->elements[j][i];
+            sum += pow(args->M->elements[j][i] - mean->elements[i], 2);
         }
         pthread_mutex_lock(args->mutex);
         args->R->elements[i] = sum / args->M->rows;
@@ -98,7 +99,7 @@ void columns_variance_parallel(Matrix *M, int n)
     free_vector(R);
 }
 
-void matrix_columns_variance(int m_rows, int m_cols, int n)
+void matrix_columns_variance(int m_rows, int m_cols, int n, int file)
 {
     if (m_rows <= 0 || m_cols <= 0)
     {
@@ -110,10 +111,20 @@ void matrix_columns_variance(int m_rows, int m_cols, int n)
         printf("Error: The number of threads must be greater than 0\n");
         exit(1);
     }
-    // Se crea la matriz
-    Matrix *M = create_matrix(m_rows, m_cols);
-    // Se inicializa la matriz con numeros aleatorios
-    init_matrix_rand(M);
+    Matrix *M = NULL;
+    // Se valida si se ingresa un archivo o se crea una matriz aleatoria
+    if (file == 1)
+    {
+        // Se crea la matriz
+        M = create_matrix_from_file("op1.txt", m_rows, m_cols);
+    }
+    else
+    {
+        // Se crea la matriz
+        M = create_matrix(m_rows, m_cols);
+        // Se inicializa la matriz con numeros aleatorios
+        init_matrix_rand(M);
+    }
     // Se imprime la matriz
     print_matrix(M);
     // Se ejecuta el calculo de la media de las matrices sin paralelismo
