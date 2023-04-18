@@ -280,13 +280,13 @@ void normalize_matrix_column_formula_1(Matrix* M, Vector* mayores, Vector* menor
     }
 }
 
-// TODO: Corregir varianza
 Vector* matrix_col_vrz(Matrix* M){
     Vector* v = create_vector(M->cols);
+    Vector* mean = matrix_col_mean(M);
     for (int i = 0; i < M->cols; ++i) {
         double sum = 0.0;
         for (int j = 0; j < M->rows; ++j) {
-            sum += M->elements[j][i];
+            sum += pow(M->elements[j][i] - mean->elements[i], 2);
         }
         v->elements[i] = sum / M->rows;
     }

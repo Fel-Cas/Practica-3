@@ -45,6 +45,10 @@ int select_operation(int o, int f, int c, int r, int s, double e, int n, int fil
         matrix_columns_variance(f, c, n, file);
         return 0;
     case 3:
+        Matrix *M = create_matrix_from_file("op1.txt", f, c);
+        Vector *V = matrix_col_std(M);
+        print_matrix(M);
+        print_vector(V);
         return 0;
     case 4:
         return 0;

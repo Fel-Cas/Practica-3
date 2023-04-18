@@ -36,12 +36,13 @@ void columns_variance(Matrix *M)
 void *column_variance_parallel(void *arg)
 {
     MatricesVarianceArgs *args = (MatricesVarianceArgs *)arg;
+    Vector *mean = matrix_col_mean(args->M);
     for (int i = args->start_row; i < args->end_row; ++i)
     {
         double sum = 0.0;
         for (int j = 0; j < args->M->rows; ++j)
         {
-            sum = sum + args->M->elements[j][i];
+            sum += pow(args->M->elements[j][i] - mean->elements[i], 2);
         }
         pthread_mutex_lock(args->mutex);
         args->R->elements[i] = sum / args->M->rows;
