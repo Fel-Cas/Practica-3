@@ -42,7 +42,7 @@ void main_normalize_formula_1(int rows, int cols, int n, int file){
     validate_data_operation_with_one_matrix(rows, cols, n);
     //Se valida si el numero de filas es iagual a 1 o no
     if(rows==1){
-       printf("It's impossible to normalize a vector matrix with only one row\n");
+       printf("It's impossible to normalize a matrix with only one row\n");
         exit(EXIT_FAILURE);
     }else{
         //Se llama a la función que normaliza la matriz
