@@ -13,6 +13,7 @@
 #include "./validations/validations.c"
 #include "./column_mean/column_mean.c"
 #include "./column_variance/column_variance.c"
+#include "./utils/minorValue.c"
 
 int select_operation(int o, int f, int c, int r, int s, double e, int n, int file);
 

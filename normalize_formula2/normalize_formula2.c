@@ -6,6 +6,7 @@
 #include "../execution_time/time.h" 
 #include "./normalize_formula2.h"
 #include "../validations/validation.h"
+#include "../utils/minorValue.h"
 
 //Estrucutra para pasar los argumentos a los hilos para normalizar una matriz
 typedef struct {
@@ -16,15 +17,7 @@ typedef struct {
     Vector* std;
     pthread_mutex_t* mutex;
 } Args_matrix_t;
-//Estructura para pasar los argumentos a los hilos para normalizar un vector
-typedef struct {
-    Vector* v;
-    float vrz;
-    float std;
-    int start_index;
-    int end_index;
-    pthread_mutex_t* mutex;
-} Args_vector_t;
+
 //Función para normalizar una matriz usando paralelismo
 void* normalize_matrix_column_formula_2_row_thread(void* args) {
     //Se castea el argumento a la estructura que se creo
@@ -42,72 +35,19 @@ void* normalize_matrix_column_formula_2_row_thread(void* args) {
     }
     pthread_exit(NULL);
 }
-
-// Función para normalizar un vector usando paralelismo
-void* normalize_vector_formula_2_thread(void* arg) {
-    Args_vector_t* args = (Args_vector_t*) arg;
-    // IItera sobre el rango de indices asignado al hilo
-    for (int i = args->start_index; i < args->end_index; ++i) {
-        //Adquiere el lock para asegurar la exclusion mutua
-        pthread_mutex_lock(args->mutex);
-        // Realiza el calculo de la normalizacion
-        args->v->elements[i] = (args->v->elements[i] - args->vrz) / args->std;
-        // Libera el lock
-        pthread_mutex_unlock(args->mutex);
-    }
-
-    return NULL;
-}
-
 //Función que recibe los argumentos para realizar la normalizacion
 void main_normalize_formula_2(int rows, int cols, int n,int file){
     //Se valida que los datos ingresados sean correctos
    validate_data_operation_with_one_matrix(rows, cols, n);
    //Se valida que el numero de filas no sea igual a 1
     if(rows==1){
-        //Se llama a la funcion para normalizar un vector
-        main_normalize_vector_formula2(cols, n, file);
+        printf("It's impossible to normalize a vector matrix with only one row\n");
+        exit(EXIT_FAILURE);
     }else{
         //Se llama a la funcion para normalizar una matriz
         main_normalize_matrix_formula2(rows, cols, n, file);
     }
 
-}
-//Función usada para normalizar un vector
-void main_normalize_vector_formula2(int cols,int n, int file){
-    Vector* v=NULL;
-    //Se valida si se va a leer el vector desde un archivo
-    if(file==1){
-        v = create_vector_from_file("op1.txt",cols);
-    }else{
-        //Se crea un vector aleatorio
-        v = create_vector(cols);
-        //Se inicializa el vector con valores aleatorios
-        init_vector_rand(v);
-    }
-    //Se imprime el vector
-    printf("El vector es: \n");
-    print_vector(v);
-    //Se calcula la media del vector
-    float vrz =vrz_vector(v);
-    printf("La media es: %f\n",vrz); 
-    //Se calcula la desviacion estandar del vector   
-    float std = std_vector(v);
-    printf("La desviacion estandar es: %f\n",std);
-    //Se crea un vector auxiliar
-    Vector* v1 = create_vector(cols);
-    //Se copia el vector original en el vector auxiliar
-    copy_vector(v1,v);
-    //Se normaliza el vector sin usar paralelismo
-    normalize_vector_formula2_without_parallel_programming(v1, vrz,std);
-    //Se crea un vector auxiliar
-    Vector* v2 = create_vector(cols);
-    //Se copia el vector original en el vector auxiliar
-    copy_vector(v2,v);
-    //Se normaliza el vector usando paralelismo
-    normalize_vector_formula2_with_parallel_programming(v2, vrz,std,n);
-    //Se libera la memoria del vector
-    free_vector(v);
 }
 //Función usada para normalizar una matriz
 void main_normalize_matrix_formula2(int rows, int cols, int n, int file){
@@ -147,20 +87,6 @@ void main_normalize_matrix_formula2(int rows, int cols, int n, int file){
     //Se libera la memoria de la matriz
     free_matrix(M);
 }
-void normalize_vector_formula2_without_parallel_programming(Vector* v, float vrz, float std){
-    printf("\nNormalize vector formula 2 without Parallel programming\n");
-    //Se obtiene el tiempo de inicio
-    struct timeval start, end;
-    gettimeofday(&start, 0);
-    //Se normaliza el vector
-    normalize_vector_formula_2(v,vrz,std);
-    //Se obtiene el tiempo de finalizacion
-    gettimeofday(&end, 0);
-    //Se imprime los resultados
-    get_execution_time(start, end);
-    print_vector(v);
-    free_vector(v);
-}
 //función para una matriz sin paralelismo
 void normalize_matrix_formula2_without_parallel_programming(Matrix* M, Vector* vrz, Vector* std){
     printf("\nNormalize matrix  formula 2 without Parallel programming\n");
@@ -176,50 +102,12 @@ void normalize_matrix_formula2_without_parallel_programming(Matrix* M, Vector* v
     free_matrix(M);
 }
 
-// Función para normalizar un vector con paralelismo
-void normalize_vector_formula2_with_parallel_programming(Vector* v, float vrz, float std, int num_threads) {
-    printf("\nNormalize vector formula 2 with Parallel programming\n");
-    // Se calcula el tamaño de cada chunk
-    int chunk_size = v->size / num_threads;
-    // Se inicializa el mutex
-    pthread_mutex_t mutex;
-    pthread_mutex_init(&mutex, NULL);
-    // Se inicializa un array para los threads
-    pthread_t threads[num_threads];
-    // Se inicializa un array para los argumentos de cada thread
-    Args_vector_t args[num_threads];
-    // Se obtiene el tiempo de inicio
-    struct timeval start, end;
-    gettimeofday(&start, 0);
-    // Se crean los threads
-    for (int i = 0; i < num_threads; ++i) {
-        // Se inicializan los argumentos de cada thread
-        args[i].v = v;
-        args[i].vrz = vrz;
-        args[i].std = std;
-        args[i].mutex = &mutex;
-        args[i].start_index = i * chunk_size;
-        args[i].end_index = (i == num_threads - 1) ? v->size : (i + 1) * chunk_size;
-        // Se crea el thread con la función normalize_vector_formula_2_thread
-        pthread_create(&threads[i], NULL, normalize_vector_formula_2_thread, &args[i]);
-    }
-    // Se espera a que terminen los threads
-    for (int i = 0; i < num_threads; ++i) {
-        pthread_join(threads[i], NULL);
-    }
-    pthread_mutex_destroy(&mutex);
-    //Se imprimen los resultados
-    gettimeofday(&end, 0);
-    get_execution_time(start, end);
-    print_vector(v);
-    free_vector(v);
-}
-
 // Función para normalizar una matriz con paralelismo
-void normalize_matrix_formula2_with_parallel_programming(Matrix* M, Vector* vrz, Vector* std, int num_threads) {
+void normalize_matrix_formula2_with_parallel_programming(Matrix* M, Vector* vrz, Vector* std, int n) {
     printf("\nNormalize matrix formula 2 with Parallel programming\n");
     struct timeval start, end;
     //Se inicializan los threads
+    int num_threads = minor_value(n, M->rows);
     pthread_t threads[num_threads];
     Args_matrix_t thread_args[num_threads];
     pthread_mutex_t mutex;

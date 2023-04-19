@@ -44,12 +44,9 @@ Vector* matrix_col_min(Matrix* M);
 Vector* matrix_col_vrz(Matrix* M);
 Vector* matrix_col_std(Matrix* M);
 void scalar_matrix(Matrix* M, double k);
-void scalar_vector(Vector* V, double k);
 
 void print_vector(const Vector* v);
 void print_matrix(const Matrix* M);
 void normalize_matrix_column_formula_1(Matrix* M, Vector* mayores, Vector* menores);
 void normalize_matrix_column_formula_2(Matrix* M, Vector* vrz, Vector* std);
-void normalize_vector_formula_1(Vector* v, float max, float min);
-void normalize_vector_formula_2(Vector* v, float vrz, float std);
 #endif

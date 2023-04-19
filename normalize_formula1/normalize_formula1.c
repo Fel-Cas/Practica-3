@@ -6,6 +6,7 @@
 #include "./normalize_formula1.h"
 #include "../execution_time/time.h" 
 #include "../validations/validation.h"
+#include "../utils/minorValue.h"
 //Estructura para pasar los argumentos a la función que normaliza la matriz
 typedef struct {
     Matrix* M;
@@ -15,33 +16,6 @@ typedef struct {
     int end_row;
     pthread_mutex_t* lock;
 } Args_normalize_form1_m_t;
-
-//Estructura para pasar los argumentos a la función que normaliza el vector
-typedef struct {
-    Vector* v;
-    float max;
-    float min;
-    int start;
-    int end;
-    pthread_mutex_t* mutex;
-}Args_normalize_form2_v_t;
-
-//Función que normaliza el vector
-void* normalize_vector_formula_1_thread(void* arg) {
-    //Se Castean los argumentos
-    Args_normalize_form2_v_t* data = (Args_normalize_form2_v_t*) arg;
-    //Se itera sobre el rango asignado al hilo
-    for (int i = data->start; i < data->end; i++) {
-        //Se adquiere el lock para asegurar la exclusión mutua
-        pthread_mutex_lock(data->mutex);
-        //Se realiza el cálculo de la normalización
-        data->v->elements[i] = (data->v->elements[i] - data->min) / (data->max - data->min);
-        //Se libera el lock
-        pthread_mutex_unlock(data->mutex);
-    }
-    //Se termina el hilo
-    pthread_exit(NULL);
-}
 
 //Función principal que normaliza la matriz
 void* normalize_formula_1(void* args_ptr) {
@@ -68,47 +42,13 @@ void main_normalize_formula_1(int rows, int cols, int n, int file){
     validate_data_operation_with_one_matrix(rows, cols, n);
     //Se valida si el numero de filas es iagual a 1 o no
     if(rows==1){
-        //Se llama a la función que normaliza el vector
-        main_normalize_vector_formula1(cols, n, file);
+       printf("It's impossible to normalize a vector matrix with only one row\n");
+        exit(EXIT_FAILURE);
     }else{
         //Se llama a la función que normaliza la matriz
         main_normalize_matrix_formula1(rows, cols, n, file);
     }
     
-}
-//Función que normaliza el vector
-void main_normalize_vector_formula1(int cols,int n, int file){
-    Vector* V=NULL;
-    //Se valida si se va a leer el vector desde un archivo o no
-    if(file==1){
-       V=create_vector_from_file("opr1.txt",cols);
-    }else{
-        //Se crea el vector
-        V=create_vector(cols);
-        //Se inicializa el vector con numeros aleatorios
-        init_vector_rand(V);
-    }
-    //Se imprime el vector
-    print_vector(V);
-    //Se obtiene el numero mayor y menor del vector
-    float max=max_vector(V);
-    printf("El numero mayor es: %f \n", max);
-    float min=min_vector(V);
-    printf("El numero menor es: %f \n", min);
-    //Se crea un vector auxiliar para realizar la normalización
-    Vector* V1= create_vector(cols);
-    //Se copia el vector original al vector auxiliar
-    copy_vector(V1,V);
-    //Se llama a la función que realiza la normalización sin usar paralelismo
-    normalize_vector_formula1_without_parallel_programming(V1, max, min);
-    //Se crea un vector auxiliar para realizar la normalización
-    Vector* V2= create_vector(cols);
-    //Se copia el vector original al vector auxiliar
-    copy_vector(V2,V);
-    //Se llama a la función que realiza la normalización usando paralelismo
-    normalize_vector_formula1_with_parallel_programming(V2, max, min, n);  
-    //Se libera la memoria   
-    free_vector(V);
 }
 
 //Función que llama las funciones que realizan la normalización de la matriz
@@ -165,27 +105,11 @@ void normalize_matrix_formula1_without_parallel_programming(Matrix* M, Vector* l
     free_matrix(M);
 }
 
-//Función que realiza la normalización de un vector sin usar paralelismo
-void normalize_vector_formula1_without_parallel_programming(Vector* v, float max, float min){
-    printf("\nNormalize vector formula 1 without Parallel programming\n");
-    //Se obtiene el tiempo de inicio
-    struct timeval start, end;
-    gettimeofday(&start, 0);
-    //Se realiza la normalización
-    normalize_vector_formula_1(v, max, min);
-    //Se obtiene el tiempo de finalización
-    gettimeofday(&end, 0);
-    //Se imprimen los resultados
-    get_execution_time(start, end);
-    print_vector(v);
-    free_vector(v);
-}
-
 //Función que realiza la normalización de una matriz usando paralelismo
 void normalize_matrix_formula1_with_parallel_programming(Matrix* M, Vector* mayores, Vector* menores, int n) {
     printf("\nNormalize matrix formula 1 with Parallel programming\n");    
     struct timeval start, end;
-    const int num_threads = n;  // Número de hilos
+    const int num_threads =minor_value(n,M->rows);  // Número de hilos
     pthread_mutex_t lock;
     //Se inicializan los locks
     pthread_mutex_init(&lock, NULL);    
@@ -230,43 +154,4 @@ void normalize_matrix_formula1_with_parallel_programming(Matrix* M, Vector* mayo
     //Se libera la memoria de la matriz
     free_matrix(M);
 }
-//Función que realiza la normalización de un vector usando paralelismo
-void normalize_vector_formula1_with_parallel_programming(Vector* v, float max, float min, int num_threads) {
-    printf("\nNormalize vector formula 1 with Parallel programming\n");
-    //Se crean los argumentos
-    Args_normalize_form2_v_t data[num_threads];
-    pthread_t threads[num_threads];
-    pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-    //Se calcula la cantidad de elementos que va a tener cada hilo
-    int elements_per_thread = v->size / num_threads;
-    //Se obtiene el tiempo de inicio
-    struct timeval start, end;
-    gettimeofday(&start, 0);
-    //Se ponen los argumentos en cada hilo
-    for (int i = 0; i < num_threads; i++) {
-        data[i].v = v;
-        data[i].max = max;
-        data[i].min = min;
-        data[i].mutex = &mutex;
-        //Se calcula el rango de elementos que va a tener cada hilo
-        if (i == num_threads - 1) {
-            data[i].start = i * elements_per_thread;
-            data[i].end = v->size;
-        } else {
-            data[i].start = i * elements_per_thread;
-            data[i].end = (i + 1) * elements_per_thread;
-        }
-        //Se llama a la función que realiza la normalización por cada hilo
-        pthread_create(&threads[i], NULL, normalize_vector_formula_1_thread, (void*) &data[i]);
-    }
-    //Se espera a que terminen los hilos
-    for (int i = 0; i < num_threads; i++) {
-        pthread_join(threads[i], NULL);
-    }
-     pthread_mutex_destroy(&mutex);
-    //Se imprimen los resultados
-    gettimeofday(&end, 0);
-    get_execution_time(start, end);
-    print_vector(v);
-    free_vector(v);
-}
+
