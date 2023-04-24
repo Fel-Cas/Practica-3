@@ -5,6 +5,7 @@
 #include "../execution_time/time.h"
 #include "./matrix_scalar.h"
 #include "../validations/validation.h"
+#include "../utils/minorValue.h"
 #include <pthread.h>
 
 
@@ -84,7 +85,7 @@ void parallel_multiply_matrix_by_scalar(Matrix* M,double scalar, int n){
 
     printf("\nParallel multiply matrix by scalar\n");
     struct timeval start, end;
-    const int num_threads = n;  // Número de hilos
+    const int num_threads =minor_value(n,M->rows);  // Número de hilos
     //Se crea un arreglo de hilos
     pthread_t threads[num_threads];
     //se inicializa la estructura de datos con el número de hilos a utilizar
