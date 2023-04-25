@@ -6,6 +6,7 @@
 #include <pthread.h>
 #include "../matrix/matrix.h"
 #include "../validations/validation.h"
+#include "../utils/minorValue.h"
 
 void add_two_matrices(int m1_rows, int m1_cols, int m2_rows, int m2_cols, int n, int file);
 void add_matrices_without_paralellism(Matrix *M, Matrix *N);
@@ -101,7 +102,7 @@ void add_matrices_with_paralellism(Matrix *M, Matrix *N, int n)
 {
     printf("\nParallel sum of matrices with paralellism\n");
     struct timeval start, end;
-    const int num_threads = n;                   // Número de hilos
+    int num_threads = minor_value(n, M->rows);               // Número de hilos
     Matrix *R = create_matrix(M->rows, M->cols); // Matriz con el resultado de la suma
     // Se crea un arreglo de hilos
     pthread_t threads[num_threads];
