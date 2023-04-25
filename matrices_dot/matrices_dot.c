@@ -6,6 +6,7 @@
 #include <pthread.h>
 #include "../matrix/matrix.h"
 #include "../validations/validation.h"
+#include "../utils/minorValue.h"
 
 void dot_two_matrices(int m1_rows, int m1_cols, int m2_rows, int m2_cols, int n, int file);
 void dot_matrices_without_paralellism(Matrix *M, Matrix *N);
@@ -107,7 +108,7 @@ void dot_matrices_with_paralellism(Matrix *M, Matrix *N, int n)
 {
     printf("\nDot of matrices with paralellism\n");
     struct timeval start, end;
-    const int num_threads = n;                   // Número de hilos
+    int num_threads = minor_value(n, M->rows);               // Número de hilos, que sea menor que el numero de filas (paralelización por filas)
     Matrix *R = create_matrix(M->rows, N->cols); // Matriz con el resultado del producto punto
     // Se crea un arreglo de hilos
     pthread_t threads[num_threads];

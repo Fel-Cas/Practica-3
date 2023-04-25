@@ -102,7 +102,7 @@ void add_matrices_with_paralellism(Matrix *M, Matrix *N, int n)
 {
     printf("\nParallel sum of matrices with paralellism\n");
     struct timeval start, end;
-    int num_threads = minor_value(n, M->rows);               // Número de hilos
+    int num_threads = minor_value(n, M->rows);               // Número de hilos, que sea menor que el numero de filas (paralelización por filas)
     Matrix *R = create_matrix(M->rows, M->cols); // Matriz con el resultado de la suma
     // Se crea un arreglo de hilos
     pthread_t threads[num_threads];
