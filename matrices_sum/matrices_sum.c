@@ -5,6 +5,7 @@
 #include "../execution_time/time.h"
 #include <pthread.h>
 #include "../matrix/matrix.h"
+#include "../validations/validation.h"
 
 void add_two_matrices(int m1_rows, int m1_cols, int m2_rows, int m2_cols, int n, int file);
 void add_matrices_without_paralellism(Matrix *M, Matrix *N);
@@ -44,6 +45,7 @@ void *add_matrices_parallel(void *arg)
 
 void add_two_matrices(int m1_rows, int m1_cols, int m2_rows, int m2_cols, int n, int file)
 {
+    validate_data_operation_with_two_matrices(m1_rows, m1_cols, m2_rows, m2_cols, n);
     Matrix *M = NULL, *N = NULL;
     // se valida si se va a leer la matriz de un archivo
     if (file == 1)
