@@ -101,8 +101,11 @@ void columns_variance_parallel(Matrix *M, int n)
 }
 
 void matrix_columns_variance(int m_rows, int m_cols, int n, int file)
-{
+{   
+    // Valida que el número de columnas sea mayor a 0.
     validate_data_operation_with_one_matrix(m_rows, m_cols, n);
+    // Valida que haya más de una fila.
+    validate_data_operation_with_one_matrix_rows(m_rows);
     Matrix *M = NULL;
     // Se valida si se ingresa un archivo o se crea una matriz aleatoria
     if (file == 1)
