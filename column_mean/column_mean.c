@@ -102,6 +102,7 @@ void columns_mean_parallel(Matrix *M, int n)
 void matrix_columns_mean(int m_rows, int m_cols, int n, int file)
 {
     validate_data_operation_with_one_matrix(m_rows, m_cols, n);
+    validate_data_operation_with_one_matrix_rows(m_rows);
     Matrix *M = NULL;
     // Se valida si se ingresa un archivo o se crea una matriz aleatoria
     if (file == 1)
