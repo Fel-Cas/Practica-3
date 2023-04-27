@@ -12,47 +12,94 @@
 typedef struct {
     int start;
     int end;
-    int column;
-    double mean;
     Matrix* matriz;
-    double result;
+    Vector* result;
     pthread_mutex_t* mutex;
 } ThreadArgs;
 
-// Función para calcular la media de una columna de la matriz
-double calcularMediaColumna(Matrix* matriz, int columna) {
-    double suma = 0.0;
-    for (int i = 0; i < matriz->rows; i++) {
-        suma += matriz->elements[i][columna];
-    }
-    return suma / matriz->rows;
-    free_matrix(matriz);
-}
+void calcular_desviacion_estandar_sin_paralelismo(Matrix* matriz){
+    // Obtener el tiempo de inicio
+    struct timeval start_time, end_time;
+    gettimeofday(&start_time, 0);
 
-// Función para calcular la desviación estándar de una columna de la matriz
-double calcularDesviacionEstandarColumna(Matrix* matriz, int columna) {
-    double media = calcularMediaColumna(matriz, columna);
-    double sumaCuadrados = 0.0;
-    for (int i = 0; i < matriz->rows; i++) {
-        double diferencia = matriz->elements[i][columna] - media;
-        sumaCuadrados += diferencia * diferencia;
-    }
-    return sqrt(sumaCuadrados / matriz->rows);
-    free_matrix(matriz);
+    // Calcular la desviación estándar sin paralelismo
+    Vector *std_col = matrix_col_std(matriz);
+
+    // Obtener el tiempo de fin
+    gettimeofday(&end_time, 0);
+
+    // Calcular el tiempo de ejecución sin paralelismo
+    printf("Sin paralelismo: \n");
+    get_execution_time(start_time, end_time);
+    print_vector(std_col);
 }
 
 // Función de hilo para calcular la desviación estándar de una columna de una matriz
 void* calcularDesviacionEstandarColumnaHilo(void* dato) {
     ThreadArgs* datos = (ThreadArgs*) dato;
 
-    // Bloquear el mutex antes de actualizar la variable que se comparte
-    pthread_mutex_lock(datos->mutex);
-
-    datos->result = calcularDesviacionEstandarColumna(datos->matriz, datos->column);
-
-    // Desbloquear el mutex después de actualizar la variable que se comparte
-    pthread_mutex_unlock(datos->mutex);
+    Vector* mean = matrix_col_mean(datos->matriz);
+    for (int i = 0; i < datos->matriz->cols; ++i) {
+        double sum = 0.0;
+        for (int j = 0; j < datos->matriz->rows; ++j) {
+            // Bloquear el mutex antes de actualizar la variable que se comparte
+            pthread_mutex_lock(datos->mutex);
+            sum += pow(datos->matriz->elements[j][i] - mean->elements[i], 2);
+            // Desbloquear el mutex después de actualizar la variable que se comparte
+            pthread_mutex_unlock(datos->mutex);
+        }
+        pthread_mutex_lock(datos->mutex);
+        datos->result->elements[i] = sqrt(sum / (datos->matriz->cols-1));
+        pthread_mutex_unlock(datos->mutex);
+    }
     pthread_exit(NULL);
+    return NULL;
+}
+
+void calcularDesviacionEstandarParalelo(Matrix *matriz, int num_threads){
+
+    // Obtener el tiempo de inicio
+    struct timeval start_time, end_time;
+    gettimeofday(&start_time, 0);
+
+    pthread_t threads[num_threads];
+    ThreadArgs data[num_threads];
+    Vector* result = create_vector(matriz->cols);
+    // Se inicializa el lock
+    pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+
+    // Crear hilos y calcular la desviación estándar en paralelo
+    // Se divide la matriz en partes iguales para cada hilo
+    const int chunk_size = matriz->cols / num_threads;
+    // Se le asigna a cada hilo una parte de la matriz
+    int start_col = 0;
+    for (int i = 0; i < num_threads; ++i)
+    {
+        int end_col = start_col + chunk_size;
+        if (i == num_threads - 1)
+        {
+            end_col = matriz->cols;
+        }
+        // Se inicializan los datos necesarios para cada hilo
+        data[i] = (ThreadArgs){.start = start_col, .end = end_col, .matriz = matriz, .result = result, .mutex = &mutex};
+        pthread_create(&threads[i], NULL, calcularDesviacionEstandarColumnaHilo, &data[i]);
+        start_col = end_col;
+    }
+
+    // Esperar a que todos los hilos terminen
+    for (int j = 0; j < num_threads; j++) {
+        pthread_join(threads[j], NULL);
+    }
+    
+    // Se destruye el lock
+    pthread_mutex_destroy(&mutex);
+    // Obtener el tiempo de fin
+    gettimeofday(&end_time, 0);
+
+    // Calcular el tiempo de ejecución con pthread
+    printf("Con pthread \n");
+    print_vector(result);
+    get_execution_time(start_time, end_time);
 }
 
 int calculate_standard_deviation_by_column(int rows, int cols, int num_threads) {
@@ -63,68 +110,10 @@ int calculate_standard_deviation_by_column(int rows, int cols, int num_threads) 
     //Se imprime la matriz
     print_matrix(matriz);
 
-    Matrix* matriz2 = create_matrix(rows, cols);
-    copy_matrix(matriz2, matriz);
-
-    // Obtener el tiempo de inicio
-    struct timeval start_time;
-    gettimeofday(&start_time, 0);
-
-    // Calcular la desviación estándar sin paralelismo
-    for (int j = 0; j < matriz2->cols; j++) {
-        double resultado = calcularDesviacionEstandarColumna(matriz2, j);
-        printf("Desviación estándar de la columna %d (sin paralelismo): %.2f\n", j, resultado);
-    }
-
-    // Obtener el tiempo de fin
-    struct timeval end_time;
-    gettimeofday(&end_time, 0);
-
-    // Calcular el tiempo de ejecución sin paralelismo
-    printf("Sin paralelismo: \n");
-    get_execution_time(start_time, end_time);
-
-    Matrix* matriz3 = create_matrix(rows, cols);
-    copy_matrix(matriz3, matriz);
-
-    // Obtener el tiempo de inicio
-    gettimeofday(&start_time, 0);
+    calcular_desviacion_estandar_sin_paralelismo(matriz);
 
     // Calcular la desviación estándar usando pthread
-    pthread_t threads[num_threads];
-    ThreadArgs data[num_threads];
-    int elementsByThread = cols / num_threads;
-    // Se inicializa el lock
-    pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-
-    // Crear hilos y calcular la desviación estándar en paralelo
-    for (int j = 0; j < num_threads; j++) {
-        data[j].start = j * elementsByThread;
-        
-        if(j == num_threads - 1){
-            data[j].end = cols;
-        }else{
-            data[j].end = data[j].start + elementsByThread;
-        }
-        
-        data[j].column = j;
-        data[j].matriz = matriz3;
-        pthread_create(&threads[j], NULL, calcularDesviacionEstandarColumnaHilo, &data[j]);
-    }
-
-    // Esperar a que todos los hilos terminen
-    for (int j = 0; j < num_threads; j++) {
-        pthread_join(threads[j], NULL);
-        printf("Desviación estándar de la columna %d: %.2f\n", j+1, data[j].result);
-    }
-    // Se destruye el lock
-    pthread_mutex_destroy(&mutex);
-    // Obtener el tiempo de fin
-    gettimeofday(&end_time, 0);
-
-    // Calcular el tiempo de ejecución con pthread
-    printf("Con pthread \n");
-    get_execution_time(start_time, end_time);
+    calcularDesviacionEstandarParalelo(matriz, num_threads);
 
     free_matrix(matriz);
 
