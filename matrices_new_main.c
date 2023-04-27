@@ -15,6 +15,7 @@
 #include "./column_variance/column_variance.c"
 #include "./utils/minorValue.c"
 #include "./standard_deviation/standard_deviation.c"
+#include "./min_max/min_max.c"
 
 
 int select_operation(int o, int f, int c, int r, int s, double e, int n, int file);
@@ -51,6 +52,7 @@ int select_operation(int o, int f, int c, int r, int s, double e, int n, int fil
         calculate_standard_deviation_by_column(f, c, n);
         return 0;
     case 4:
+        calculate_min_max_by_columns(f, c, n);
         return 0;
     case 5:
         add_two_matrices(f, c, r, s, n, file);

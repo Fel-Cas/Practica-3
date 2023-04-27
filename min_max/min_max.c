@@ -40,7 +40,8 @@ void* min_max_cols_thread(void* arg) {
     pthread_exit(NULL);
 }
 
-void min_max_cols_range(Matrix* matrix, MinMax* min_max, int start_col, int end_col) {
+void min_max_cols_range(Matrix* matrix, void* min_max, int start_col, int end_col) {
+    MinMax* thread_arg = (MinMax*) min_max;
     int i, j;
     double min_value = matrix->elements[0][start_col];
     double max_value = matrix->elements[0][start_col];
@@ -58,15 +59,15 @@ void min_max_cols_range(Matrix* matrix, MinMax* min_max, int start_col, int end_
     }
 
     // Bloquear mutex y actualizar valores mínimo y máximo compartidos
-    pthread_mutex_lock(&min_max->mutex);
-    if (min_value < min_max->min_value) {
-        min_max->min_value = min_value;
+    pthread_mutex_lock(&thread_arg->mutex);
+    if (min_value < thread_arg->min_value) {
+        thread_arg->min_value = min_value;
     }
-    if (max_value > min_max->max_value) {
-        min_max->max_value = max_value;
+    if (max_value > thread_arg->max_value) {
+        thread_arg->max_value = max_value;
     }
     // Se desbloquea el mutex    
-    pthread_mutex_unlock(&min_max->mutex);
+    pthread_mutex_unlock(&thread_arg->mutex);
 }
 
 // Método que utiliza paralelismo para calcular los valores mínimos y máximos de todas las columnas de una matriz
@@ -88,7 +89,7 @@ void min_max_cols_parallel(Matrix* matrix, double* min_values, double* max_value
         thread_args[i]->start_col = start_col;
         thread_args[i]->end_col = end_col;
         thread_args[i]->mutex = &mutex;
-        pthread_create(&threads[i], NULL, min_max_cols_thread, (void*) &thread_args[i]);
+        pthread_create(&threads[i], NULL, min_max_cols_thread, &thread_args[i]);
         start_col = end_col;
     }
     for (int i = 0; i < num_threads; i++) {
@@ -133,7 +134,7 @@ int calculate_min_max_by_columns(int rows, int cols, int num_threads) {
     struct timeval start_time;    
     gettimeofday(&start_time, 0); // Se inicializa el tiempo
 
-    min_max_cols(&matrix2, min_values, max_values);
+    min_max_cols(matrix2, min_values, max_values);
 
     struct timeval end_time;
     gettimeofday(&end_time, 0);
@@ -158,14 +159,20 @@ int calculate_min_max_by_columns(int rows, int cols, int num_threads) {
     for (int j = 0; j < matrix3->cols; j++) {
         min_values[j] = matrix3->elements[0][j]; // Inicializa el valor mínimo de la columna con el primer elemento
         max_values[j] = matrix3->elements[0][j]; // Inicializa el valor máximo de la columna con el primer elemento
+        printf("valores mínimimos %f y máximos %f", min_values[j], max_values[j]);
     }
-    min_max_cols_parallel(&matrix3, min_values, max_values, num_threads);
-
+    gettimeofday(&start_time, 0);
+    min_max_cols_parallel(matrix3, min_values, max_values, num_threads);
+    gettimeofday(&end_time, 0);
     // Imprime los nuevos valores mínimos y máximos de cada columna
     printf("Min/max values of each column (with parallelism):\n");
     for (int j = 0; j < matrix3->cols; j++) {
         printf("Column %d: %f (min), %f (max)\n", j, min_values[j], max_values[j]);
     }
+
+    // Calcular el tiempo de ejecución con pthread
+    printf("Con pthread \n");
+    get_execution_time(start_time, end_time);
 
     // Libera la memoria utilizada por la matriz
     free(matrix);
