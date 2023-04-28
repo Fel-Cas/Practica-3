@@ -5,7 +5,9 @@ Se realizarán operaciones con matrices, utilizando paralelismo y concurrencia, 
 
 ## ¿Cómo ejecutar?
 Para ejecutar el programa, se debe ejecutar el siguiente comando: 
+```
 gcc -Wall -o matrices matrices.c -lm
+```
 
 ## ¿Cómo funciona?
 El programa recibe como parámetros el número de filas y columnas de las matrices, y el número de hilos a utilizar a traves de las flags.
