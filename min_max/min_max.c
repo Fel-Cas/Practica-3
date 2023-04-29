@@ -41,7 +41,6 @@ void* min_cols_thread(void* arg){
         pthread_mutex_unlock(args->mutex);
     }
     pthread_exit(NULL);
-    return NULL;
 }
 
 void* max_cols_thread(void* arg){
@@ -61,11 +60,6 @@ void* max_cols_thread(void* arg){
         pthread_mutex_unlock(args->mutex);
     }
     pthread_exit(NULL);
-    return NULL;
-}
-
-void min_max_cols_range(Matrix* matrix, void* min_max, int start_col, int end_col) {
-    
 }
 
 // Método que utiliza paralelismo para calcular los valores mínimos y máximos de todas las columnas de una matriz
@@ -140,9 +134,10 @@ void min_max_cols_without_parallelism(Matrix* matrix){
 
     printf("Valores mínimos: \n");
     print_vector(min_col);
+
 }
 
-int calculate_min_max_by_columns(int rows, int cols, int num_threads) {
+void calculate_min_max_by_columns(int rows, int cols, int num_threads) {
     // Crear y llenar la matriz
     Matrix* matrix = create_matrix(rows, cols);
     //Se inicializa la matriz con numeros aleatorios
@@ -154,5 +149,5 @@ int calculate_min_max_by_columns(int rows, int cols, int num_threads) {
     
     min_max_cols_parallel(matrix, num_threads);
 
-    return 0;
+    free(matrix);
 }
