@@ -36,3 +36,23 @@ void validate_data_operation_with_two_matrices(int m1_rows, int m1_cols, int m2_
         exit(EXIT_FAILURE);
     }
 }
+
+void validate_data_operation_standard_deviation(int rows, int cols, int n){
+    // Valida que las filas y columnas sean mayores a 0
+    if(cols <= 0){
+        printf("The number of columns must be greater than 0\n");
+        exit(EXIT_FAILURE);
+    }
+
+    // Valida que haya por lo menos dos datos
+    if(rows <= 1){
+        printf("The number of rows must be greater than 1\n");
+        exit(EXIT_FAILURE);
+    }
+
+    // Valida que el número de hilos sea mayor a 0
+    if(n <= 0){
+        printf("Number of threads must be greater than 0\n");
+        exit(EXIT_FAILURE);
+    }
+}
