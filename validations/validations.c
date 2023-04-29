@@ -56,3 +56,16 @@ void validate_data_operation_standard_deviation(int rows, int cols, int n){
         exit(EXIT_FAILURE);
     }
 }
+
+void validate_data_operation_with_min_max(int rows, int cols, int n){
+    // Valida que las filas y columnas sean mayores a 0
+    if(rows <= 0 || rows <= 0 || cols <= 0 || cols <= 0){
+        printf("The number of rows and columns must be greater than 0\n");
+        exit(EXIT_FAILURE);
+    }
+    //validar que el número de hilos sea mayor a 0
+    if(n <= 0){
+        printf("Number of threads must be greater than 0\n");
+        exit(EXIT_FAILURE);
+    }
+}

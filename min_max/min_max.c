@@ -4,6 +4,8 @@
 #include <pthread.h>
 #include "./min_max.h"
 #include "../execution_time/time.h"
+#include "../validations/validation.h"
+#include "../utils/minorValue.h"
 
 // Define los argumentos que se le pasan a cada hilo en el método min_max_cols_thread
 typedef struct {
@@ -63,9 +65,11 @@ void* max_cols_thread(void* arg){
 }
 
 // Método que utiliza paralelismo para calcular los valores mínimos y máximos de todas las columnas de una matriz
-void min_max_cols_parallel(Matrix* matriz, int num_threads){
+void min_max_cols_parallel(Matrix* matriz, int n){
     struct timeval start_time, end_time;
     gettimeofday(&start_time, 0);
+
+    int num_threads = minor_value(n, matriz->rows);
 
     pthread_t threads[num_threads];
     MinMaxArgs min_max_args[num_threads];
@@ -137,7 +141,8 @@ void min_max_cols_without_parallelism(Matrix* matrix){
 
 }
 
-void calculate_min_max_by_columns(int rows, int cols, int num_threads, int file) {
+void calculate_min_max_by_columns(int rows, int cols, int n, int file) {
+    validate_data_operation_with_min_max(rows, cols, n);
 
     Matrix *matrix = NULL;
 
@@ -150,13 +155,13 @@ void calculate_min_max_by_columns(int rows, int cols, int num_threads, int file)
         //Se inicializa la matriz con numeros aleatorios
         init_matrix_rand(matrix);                
     }
-    
+
     //Se imprime la matriz
     print_matrix(matrix);
 
     min_max_cols_without_parallelism(matrix);
     
-    min_max_cols_parallel(matrix, num_threads);
+    min_max_cols_parallel(matrix, n);
 
     free(matrix);
 }
