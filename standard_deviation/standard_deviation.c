@@ -7,6 +7,8 @@
 #include <time.h>
 #include "./standard_deviation.h"
 #include "../execution_time/time.h"
+#include "../validations/validation.h"
+#include "../utils/minorValue.h"
 
 // Estructura para los argumentos del hilo
 typedef struct {
@@ -22,8 +24,10 @@ void calcular_desviacion_estandar_sin_paralelismo(Matrix* matriz){
     struct timeval start_time, end_time;
     gettimeofday(&start_time, 0);
 
-    // Calcular la desviación estándar sin paralelismo
-    Vector *std_col = matrix_col_std(matriz);
+    Vector *std_col = NULL;
+
+    // Calcular la desviación estándar sin paralelismo    
+    std_col = matrix_col_std(matriz);
 
     // Obtener el tiempo de fin
     gettimeofday(&end_time, 0);
@@ -31,6 +35,7 @@ void calcular_desviacion_estandar_sin_paralelismo(Matrix* matriz){
     // Calcular el tiempo de ejecución sin paralelismo
     printf("Sin paralelismo: \n");
     get_execution_time(start_time, end_time);
+    printf("Desviación estándar por columna:\n");
     print_vector(std_col);
 }
 
@@ -49,18 +54,20 @@ void* calcularDesviacionEstandarColumnaHilo(void* dato) {
             pthread_mutex_unlock(datos->mutex);
         }
         pthread_mutex_lock(datos->mutex);
-        datos->result->elements[i] = sqrt(sum / (datos->matriz->cols-1));
+        datos->result->elements[i] = sqrt(sum / (datos->matriz->rows-1));
         pthread_mutex_unlock(datos->mutex);
     }
     pthread_exit(NULL);
     return NULL;
 }
 
-void calcularDesviacionEstandarParalelo(Matrix *matriz, int num_threads){
+void calcularDesviacionEstandarParalelo(Matrix *matriz, int n){
 
     // Obtener el tiempo de inicio
     struct timeval start_time, end_time;
     gettimeofday(&start_time, 0);
+
+    int num_threads = minor_value(n, matriz->rows);
 
     pthread_t threads[num_threads];
     ThreadArgs data[num_threads];
@@ -98,24 +105,33 @@ void calcularDesviacionEstandarParalelo(Matrix *matriz, int num_threads){
 
     // Calcular el tiempo de ejecución con pthread
     printf("Con pthread \n");
-    print_vector(result);
     get_execution_time(start_time, end_time);
+    printf("Desviación estándar por columna:\n");
+    print_vector(result);
 }
 
-int calculate_standard_deviation_by_column(int rows, int cols, int num_threads) {
-    // Crear y llenar la matriz
-    Matrix* matriz = create_matrix(rows, cols);
-    //Se inicializa la matriz con numeros aleatorios
-    init_matrix_rand(matriz);
+void calculate_standard_deviation_by_column(int rows, int cols, int n, int file) {
+    validate_data_operation_standard_deviation(rows, cols, n);
+    
+    Matrix *matriz = NULL;
+
+    if(file == 1){
+        // Se crea la matriz del archivo
+        matriz = create_matrix_from_file("op1.txt", rows, cols);
+    }else{
+        // Crear y llenar la matriz
+        matriz = create_matrix(rows, cols);
+        //Se inicializa la matriz con numeros aleatorios
+        init_matrix_rand(matriz);
+    }
+   
     //Se imprime la matriz
     print_matrix(matriz);
 
     calcular_desviacion_estandar_sin_paralelismo(matriz);
 
     // Calcular la desviación estándar usando pthread
-    calcularDesviacionEstandarParalelo(matriz, num_threads);
+    calcularDesviacionEstandarParalelo(matriz, n);
 
     free_matrix(matriz);
-
-    return 0;
 }
