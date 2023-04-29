@@ -135,10 +135,11 @@ void min_max_cols_without_parallelism(Matrix* matrix){
 
     printf("Valores máximos: \n");
     print_vector(max_col);
+    free_vector(max_col);
 
     printf("Valores mínimos: \n");
     print_vector(min_col);
-
+    free_vector(min_col);
 }
 
 void calculate_min_max_by_columns(int rows, int cols, int n, int file) {

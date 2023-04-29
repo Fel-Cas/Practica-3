@@ -54,6 +54,7 @@ void* calcularDesviacionEstandarColumnaHilo(void* dato) {
             pthread_mutex_unlock(datos->mutex);
         }
         pthread_mutex_lock(datos->mutex);
+        // Se calcula la desviación estándar
         datos->result->elements[i] = sqrt(sum / (datos->matriz->rows-1));
         pthread_mutex_unlock(datos->mutex);
     }
@@ -108,6 +109,7 @@ void calcularDesviacionEstandarParalelo(Matrix *matriz, int n){
     get_execution_time(start_time, end_time);
     printf("Desviación estándar por columna:\n");
     print_vector(result);
+    free_vector(result);
 }
 
 void calculate_standard_deviation_by_column(int rows, int cols, int n, int file) {
