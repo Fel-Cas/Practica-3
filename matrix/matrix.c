@@ -301,7 +301,7 @@ Vector* matrix_col_std(Matrix* M){
         for (int j = 0; j < M->rows; ++j) {
             sum += pow(M->elements[j][i] - mean->elements[i], 2);
         }
-        v->elements[i] = sqrt(sum / (M->cols-1));
+        v->elements[i] = sqrt(sum / (M->rows-1));
     }
     return v; 
 }
