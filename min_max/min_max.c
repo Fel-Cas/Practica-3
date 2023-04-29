@@ -137,11 +137,20 @@ void min_max_cols_without_parallelism(Matrix* matrix){
 
 }
 
-void calculate_min_max_by_columns(int rows, int cols, int num_threads) {
-    // Crear y llenar la matriz
-    Matrix* matrix = create_matrix(rows, cols);
-    //Se inicializa la matriz con numeros aleatorios
-    init_matrix_rand(matrix);
+void calculate_min_max_by_columns(int rows, int cols, int num_threads, int file) {
+
+    Matrix *matrix = NULL;
+
+    if(file == 1){
+        // Se crea la matriz del archivo
+        matrix = create_matrix_from_file("op1.txt", rows, cols);
+    }else{
+        // Crear y llenar la matriz
+        matrix = create_matrix(rows, cols);
+        //Se inicializa la matriz con numeros aleatorios
+        init_matrix_rand(matrix);                
+    }
+    
     //Se imprime la matriz
     print_matrix(matrix);
 
